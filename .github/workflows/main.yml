@@ -49,4 +49,4 @@ jobs:
 
         - name: Run bandit security scan
           run: |
-              bandit -r your_project_directory/ -x tests/,venv/,__pycache__/  
+              bandit .
