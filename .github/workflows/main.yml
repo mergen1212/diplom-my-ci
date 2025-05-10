@@ -1,17 +1,18 @@
-name: Run mypy
+name: Lint and Security Checks
 
 on:
   push:
     branches:
-      - main
       - master
+      - develop
   pull_request:
     branches:
-      - main
       - master
+      - develop
 
 jobs:
   mypy-check:
+    name: Run mypy (Type Checking)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,12 +25,28 @@ jobs:
       - name: Install dependencies
         run: |
           pip install mypy
-          # Если используется poetry
-          # pip install poetry && poetry install --no-root
-
-          # Если используется requirements.txt
+          # Если используется requirements.txt:
           # pip install -r requirements.txt
+          # Если используется poetry:
+          # pip install poetry && poetry install --no-root
 
       - name: Run mypy
         run: |
-          python -m mypy .
+          python -m mypy --strict .
+  bandit-scan:
+      name: Run bandit (Security Scan)
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4 
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+              python-version: '3.11'
+
+        - name: Install bandit
+          run: |
+              pip install bandit
+
+        - name: Run bandit security scan
+          run: |
+              bandit -r your_project_directory/ -x tests/,venv/,__pycache__/  
