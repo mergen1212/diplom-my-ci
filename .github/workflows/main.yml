@@ -1,4 +1,4 @@
-name: Lint and Security Checks
+name: CI Pipeline — Tests, Coverage, Mypy, Bandit
 
 on:
   push:
@@ -16,37 +16,55 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
-      - name: Install dependencies
+      - name: Install mypy
         run: |
           pip install mypy
-          # Если используется requirements.txt:
-          # pip install -r requirements.txt
-          # Если используется poetry:
-          # pip install poetry && poetry install --no-root
+          # pip install poetry && poetry install --no-root (если используется Poetry)
 
       - name: Run mypy
         run: |
           python -m mypy --strict .
+
   bandit-scan:
-      name: Run bandit (Security Scan)
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4 
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-              python-version: '3.11'
+    name: Run bandit (Security Scan)
+    runs-on: ubuntu-latest
+    needs: mypy-check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
 
-        - name: Install bandit
-          run: |
-              pip install bandit
+      - name: Install bandit
+        run: |
+          pip install bandit
 
-        - name: Run bandit security scan
-          run: |
-              bandit -r .
+      - name: Run bandit security scan
+        run: |
+          bandit -r .
+  test:
+    name: Run Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: bandit-scan
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-cov mypy bandit
+          # или используйте poetry:
+          # pip install poetry && poetry install --no-root
+
+      - name: Run tests and generate coverage report
+        run: |
+          python -m pytest --cov=. --cov-report=xml --cov-report=term
