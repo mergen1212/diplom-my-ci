@@ -1,5 +1,5 @@
 import sqlite3
-from typing import  Tuple
+from typing import  List, Tuple
 
 
 def create_table() -> sqlite3.Connection:
@@ -12,7 +12,7 @@ def create_table() -> sqlite3.Connection:
     return conn
 
 
-def vulnerable_query(conn: sqlite3.Connection, user_input: str) -> list[Tuple]:
+def vulnerable_query(conn: sqlite3.Connection, user_input: str) -> List[Tuple]:
     """НЕбезопасный SQL-запрос — уязвимость SQL-инъекции."""
     cursor = conn.cursor()
     query = f"SELECT * FROM users WHERE name = '{user_input}'"
@@ -20,7 +20,7 @@ def vulnerable_query(conn: sqlite3.Connection, user_input: str) -> list[Tuple]:
     return cursor.fetchall()
 
 
-def safe_query(conn: sqlite3.Connection, user_input: str) -> list[Tuple]:
+def safe_query(conn: sqlite3.Connection, user_input: str) -> List[Tuple]:
     """Безопасный SQL-запрос с параметризованным вводом."""
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE name = ?", (user_input,))

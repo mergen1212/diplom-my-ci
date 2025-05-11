@@ -1,6 +1,6 @@
 import pytest
 import sqlite3
-from typing import Tuple
+from typing import List, Tuple
 
 from db import create_table, vulnerable_query, safe_query
 
@@ -35,5 +35,5 @@ def test_safe_query_sql_injection() -> None:
     malicious_input = "Alice'; DROP TABLE users; --"
 
     # Safe query должен выполниться без ошибок и не удалить таблицу
-    result: list[Tuple] = safe_query(conn, malicious_input)
+    result: List[Tuple] = safe_query(conn, malicious_input)
     assert len(result) == 0  # Такого пользователя нет
