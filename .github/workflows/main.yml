@@ -23,7 +23,7 @@ jobs:
 
       - name: Install mypy
         run: |
-          pip install mypy
+          pip install mypy pytest
           # pip install poetry && poetry install --no-root (если используется Poetry)
 
       - name: Run mypy
